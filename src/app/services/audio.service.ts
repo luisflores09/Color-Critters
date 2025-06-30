@@ -8,6 +8,8 @@ export class AudioService {
   private isAudioEnabled = true;
   private speechSynthesis: SpeechSynthesis | null = null;
   private speechEnabled = false; // Track if speech was enabled by user interaction
+  private initializationAttempts = 0;
+  private maxInitializationAttempts = 5;
 
   constructor() {
     this.initializeAudio();
@@ -41,35 +43,98 @@ export class AudioService {
 
   // Enable audio after user interaction (required by browsers)
   async enableAudio(): Promise<void> {
+    this.initializationAttempts++;
+    console.log(`Audio initialization attempt ${this.initializationAttempts}`);
+    
+    // Always try to resume audio context
     if (this.audioContext && this.audioContext.state === 'suspended') {
       try {
         await this.audioContext.resume();
         this.isAudioEnabled = true;
+        console.log('Audio context resumed');
       } catch (error) {
         console.warn('Could not resume audio context:', error);
       }
     }
     
-    // Enable speech synthesis on user interaction
+    // Try to enable speech synthesis (attempt multiple times if needed)
     if (this.speechSynthesis && !this.speechEnabled) {
-      try {
-        // Test speech synthesis to ensure it's enabled
-        const testUtterance = new SpeechSynthesisUtterance('');
+      await this.initializeSpeechSynthesis();
+    }
+    
+    // Force another attempt if speech still not enabled and we haven't exceeded max attempts
+    if (!this.speechEnabled && this.initializationAttempts < this.maxInitializationAttempts) {
+      console.log('Speech not enabled yet, will retry on next interaction');
+    }
+  }
+
+  private async initializeSpeechSynthesis(): Promise<void> {
+    if (!this.speechSynthesis) return;
+    
+    try {
+      // Wait for voices to load if they haven't yet
+      await this.waitForVoices();
+      
+      // Test speech synthesis multiple times for reliability
+      for (let i = 0; i < 3; i++) {
+        const testUtterance = new SpeechSynthesisUtterance('test');
         testUtterance.volume = 0; // Silent test
+        testUtterance.rate = 2; // Fast to minimize delay
         this.speechSynthesis.speak(testUtterance);
         this.speechSynthesis.cancel(); // Cancel immediately
-        this.speechEnabled = true;
-        console.log('Speech synthesis enabled');
-      } catch (error) {
-        console.warn('Could not enable speech synthesis:', error);
+        
+        // Small delay between attempts
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
+      
+      this.speechEnabled = true;
+      console.log('Speech synthesis enabled successfully');
+    } catch (error) {
+      console.warn('Could not enable speech synthesis:', error);
     }
+  }
+
+  private waitForVoices(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.speechSynthesis) {
+        resolve();
+        return;
+      }
+      
+      const voices = this.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        console.log(`Found ${voices.length} voices`);
+        resolve();
+      } else {
+        console.log('Waiting for voices to load...');
+        this.speechSynthesis.addEventListener('voiceschanged', () => {
+          const newVoices = this.speechSynthesis!.getVoices();
+          console.log(`Voices loaded: ${newVoices.length} available`);
+          resolve();
+        }, { once: true });
+        
+        // Fallback timeout
+        setTimeout(() => {
+          console.log('Voice loading timeout, proceeding anyway');
+          resolve();
+        }, 1000);
+      }
+    });
   }
 
   // Text-to-speech methods
   speakAnimalName(animalName: string): void {
-    if (!this.isAudioEnabled || !this.speechSynthesis || !this.speechEnabled) {
-      console.log('Speech not enabled yet');
+    // Try to enable speech if not already enabled
+    if (!this.speechEnabled) {
+      console.log('Speech not enabled, attempting to enable...');
+      this.enableAudio();
+      // Try again after a short delay
+      setTimeout(() => this.speakAnimalName(animalName), 200);
+      return;
+    }
+    
+    if (!this.isAudioEnabled || !this.speechSynthesis) {
+      console.log('Audio or speech synthesis not available');
       return;
     }
 
@@ -98,8 +163,17 @@ export class AudioService {
   }
 
   speakTargetAnimal(animalName: string): void {
-    if (!this.isAudioEnabled || !this.speechSynthesis || !this.speechEnabled) {
-      console.log('Speech not enabled yet for target');
+    // Try to enable speech if not already enabled
+    if (!this.speechEnabled) {
+      console.log('Speech not enabled for target, attempting to enable...');
+      this.enableAudio();
+      // Try again after a short delay
+      setTimeout(() => this.speakTargetAnimal(animalName), 200);
+      return;
+    }
+    
+    if (!this.isAudioEnabled || !this.speechSynthesis) {
+      console.log('Audio or speech synthesis not available for target');
       return;
     }
 

@@ -34,12 +34,16 @@ export class GameHeaderComponent {
     const currentEnabled = this.audioService.isEnabled();
     this.audioService.setAudioEnabled(!currentEnabled);
     
-    // Play a test sound if enabling
-    if (!currentEnabled) {
-      this.audioService.enableAudio().then(() => {
+    // Always try to enable audio and speech on toggle
+    this.audioService.enableAudio().then(() => {
+      if (!currentEnabled) {
+        // Test both sound and speech when enabling
         this.audioService.playSuccessSound();
-      });
-    }
+        setTimeout(() => {
+          this.audioService.speakAnimalName('test');
+        }, 300);
+      }
+    });
   }
 
   isAudioEnabled(): boolean {

@@ -77,6 +77,9 @@ export class GameService {
   }
 
   onCritterTap(critterId: number): void {
+    // Try to enable audio on every interaction for mobile compatibility
+    this.audioService.enableAudio();
+    
     const currentState = this.getCurrentState();
     const critter = currentState.critters.find(c => c.id === critterId);
     
