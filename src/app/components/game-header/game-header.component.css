@@ -3,10 +3,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 15px 20px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 .target-color-display {
@@ -33,6 +34,7 @@
   border: 4px solid white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   animation: pulse 2s infinite;
+  flex-shrink: 0;
 }
 
 .score-display {
@@ -62,17 +64,51 @@
 @media (max-width: 768px) {
   .game-header {
     flex-direction: column;
-    gap: 15px;
-    padding: 15px;
+    gap: 10px;
+    padding: 10px 15px;
   }
   
   .target-color-display h2 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
   
   .target-color-indicator {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     font-size: 1.5rem;
+  }
+  
+  .score-number {
+    font-size: 2rem;
+  }
+}
+
+/* iPhone and small mobile devices */
+@media (max-width: 480px) {
+  .game-header {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  
+  .target-color-display {
+    gap: 10px;
+  }
+  
+  .target-color-display h2 {
+    font-size: 1rem;
+  }
+  
+  .target-color-indicator {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .score-label {
+    font-size: 0.9rem;
+  }
+  
+  .score-number {
+    font-size: 1.8rem;
   }
 }

@@ -1,9 +1,13 @@
 /* Game Controls */
 .game-controls {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0; /* Prevent controls from shrinking */
+  /* Add safe area padding for devices with home indicators */
+  padding-bottom: max(15px, env(safe-area-inset-bottom));
 }
 
 .game-button {
@@ -18,6 +22,8 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
   font-family: inherit;
+  min-height: 50px; /* Ensure button is tall enough for touch */
+  min-width: 120px;
 }
 
 .game-button:hover:not(:disabled) {
@@ -34,10 +40,58 @@
   cursor: not-allowed;
 }
 
-/* Touch-friendly improvements */
-@media (hover: none) and (pointer: coarse) {
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .game-controls {
+    padding: 10px 15px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+  }
+  
+  .game-button {
+    padding: 18px 35px;
+    font-size: 1.3rem;
+    min-height: 55px;
+    min-width: 140px;
+  }
+}
+
+/* iPhone and small mobile devices */
+@media (max-width: 480px) {
+  .game-controls {
+    padding: 8px 10px;
+    /* Increase bottom padding significantly for mobile browsers */
+    padding-bottom: max(25px, env(safe-area-inset-bottom, 25px));
+  }
+  
   .game-button {
     padding: 20px 40px;
     font-size: 1.4rem;
+    min-height: 60px;
+    min-width: 160px;
+    /* Add margin-bottom to create more space from browser UI */
+    margin-bottom: 10px;
+  }
+}
+
+/* Additional spacing for browsers that don't support safe-area-inset */
+@supports not (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 480px) {
+    .game-controls {
+      padding-bottom: 35px;
+    }
+  }
+}
+
+/* Landscape mode on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .game-controls {
+    padding: 8px 15px;
+    padding-bottom: max(15px, env(safe-area-inset-bottom, 15px));
+  }
+  
+  .game-button {
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    min-height: 45px;
   }
 }
