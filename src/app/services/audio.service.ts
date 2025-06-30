@@ -7,6 +7,7 @@ export class AudioService {
   private audioContext: AudioContext | null = null;
   private isAudioEnabled = true;
   private speechSynthesis: SpeechSynthesis | null = null;
+  private speechEnabled = false; // Track if speech was enabled by user interaction
 
   constructor() {
     this.initializeAudio();
@@ -48,11 +49,29 @@ export class AudioService {
         console.warn('Could not resume audio context:', error);
       }
     }
+    
+    // Enable speech synthesis on user interaction
+    if (this.speechSynthesis && !this.speechEnabled) {
+      try {
+        // Test speech synthesis to ensure it's enabled
+        const testUtterance = new SpeechSynthesisUtterance('');
+        testUtterance.volume = 0; // Silent test
+        this.speechSynthesis.speak(testUtterance);
+        this.speechSynthesis.cancel(); // Cancel immediately
+        this.speechEnabled = true;
+        console.log('Speech synthesis enabled');
+      } catch (error) {
+        console.warn('Could not enable speech synthesis:', error);
+      }
+    }
   }
 
   // Text-to-speech methods
   speakAnimalName(animalName: string): void {
-    if (!this.isAudioEnabled || !this.speechSynthesis) return;
+    if (!this.isAudioEnabled || !this.speechSynthesis || !this.speechEnabled) {
+      console.log('Speech not enabled yet');
+      return;
+    }
 
     // Cancel any ongoing speech
     this.speechSynthesis.cancel();
@@ -74,11 +93,15 @@ export class AudioService {
       utterance.voice = childVoice;
     }
 
+    console.log('Speaking:', animalName);
     this.speechSynthesis.speak(utterance);
   }
 
   speakTargetAnimal(animalName: string): void {
-    if (!this.isAudioEnabled || !this.speechSynthesis) return;
+    if (!this.isAudioEnabled || !this.speechSynthesis || !this.speechEnabled) {
+      console.log('Speech not enabled yet for target');
+      return;
+    }
 
     // Cancel any ongoing speech
     this.speechSynthesis.cancel();
@@ -101,6 +124,7 @@ export class AudioService {
       utterance.voice = childVoice;
     }
 
+    console.log('Speaking target:', message);
     this.speechSynthesis.speak(utterance);
   }
 

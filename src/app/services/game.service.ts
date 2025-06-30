@@ -49,7 +49,12 @@ export class GameService {
     this.clearIntervals();
     
     // Enable audio on first user interaction
-    this.audioService.enableAudio();
+    this.audioService.enableAudio().then(() => {
+      // Small delay to ensure speech synthesis is ready
+      setTimeout(() => {
+        this.setNewTargetAnimal();
+      }, 100);
+    });
     
     const newState: GameState = {
       gameActive: true,
@@ -60,7 +65,6 @@ export class GameService {
     };
 
     this.updateGameState(newState);
-    this.setNewTargetAnimal();
     this.startGameIntervals();
   }
 
@@ -272,11 +276,12 @@ export class GameService {
     const targetAnimal = this.getAnimalByName(currentState.targetAnimal);
     
     if (targetAnimal) {
-      // Play both sound and speech
+      // Play both sound and speech with longer delay for mobile
       this.audioService.playColorAnnouncement(); // Attention sound
       setTimeout(() => {
+        console.log('Attempting to speak target animal:', targetAnimal.name);
         this.audioService.speakTargetAnimal(targetAnimal.name);
-      }, 500); // Small delay after attention sound
+      }, 800); // Longer delay for mobile compatibility
     }
   }
 
