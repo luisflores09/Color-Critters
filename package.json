@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:gh-pages": "ng build --base-href=/Color-Critters/ --output-path=docs",
+    "deploy": "npm run build:gh-pages && npx angular-cli-ghpages --dir=docs"
   },
   "private": true,
   "dependencies": {
