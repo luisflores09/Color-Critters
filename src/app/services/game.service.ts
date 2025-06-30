@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Critter, GameColor, GameState } from '../models/critter.model';
+import { AudioService } from './audio.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,10 +31,13 @@ export class GameService {
   private spawnInterval: any;
   private cleanupInterval: any;
 
-  constructor() { }
+  constructor(private audioService: AudioService) { }
 
   startGame(): void {
     this.clearIntervals();
+    
+    // Enable audio on first user interaction
+    this.audioService.enableAudio();
     
     const newState: GameState = {
       gameActive: true,
@@ -160,6 +164,9 @@ export class GameService {
       ...currentState,
       critters: [...currentState.critters, newCritter]
     });
+
+    // Play a subtle spawn sound
+    this.audioService.playCritterSpawnSound();
   }
 
   private removeCritter(id: number): void {
@@ -222,20 +229,20 @@ export class GameService {
     }
   }
 
-  // Audio methods (placeholders for now)
+  // Audio methods - now using AudioService
   private playColorAnnouncement(): void {
-    console.log(`New target color: ${this.getCurrentState().targetColor}`);
+    this.audioService.playColorAnnouncement();
   }
 
   private playSuccessSound(): void {
-    console.log('Success! 🎉');
+    this.audioService.playSuccessSound();
   }
 
   private playEncouragementSound(): void {
-    console.log('Try again! 😊');
+    this.audioService.playEncouragementSound();
   }
 
   private playVictorySound(): void {
-    console.log('Celebration time! 🎊');
+    this.audioService.playVictorySound();
   }
 }

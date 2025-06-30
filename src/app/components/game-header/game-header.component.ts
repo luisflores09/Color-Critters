@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GameService } from '../../services/game.service';
+import { AudioService } from '../../services/audio.service';
 
 @Component({
   selector: 'app-game-header',
@@ -12,7 +13,10 @@ export class GameHeaderComponent {
   @Input() targetColor: string = '';
   @Input() score: number = 0;
 
-  constructor(private gameService: GameService) {}
+  constructor(
+    private gameService: GameService,
+    private audioService: AudioService
+  ) {}
 
   getTargetColorEmoji(): string {
     return this.gameService.getTargetColorEmoji();
@@ -20,5 +24,21 @@ export class GameHeaderComponent {
 
   getColorHex(colorName: string): string {
     return this.gameService.getColorHex(colorName);
+  }
+
+  toggleAudio(): void {
+    const currentEnabled = this.audioService.isEnabled();
+    this.audioService.setAudioEnabled(!currentEnabled);
+    
+    // Play a test sound if enabling
+    if (!currentEnabled) {
+      this.audioService.enableAudio().then(() => {
+        this.audioService.playSuccessSound();
+      });
+    }
+  }
+
+  isAudioEnabled(): boolean {
+    return this.audioService.isEnabled();
   }
 }

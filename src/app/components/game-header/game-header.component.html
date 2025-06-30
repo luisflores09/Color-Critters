@@ -6,8 +6,18 @@
       {{ getTargetColorEmoji() }}
     </div>
   </div>
-  <div class="score-display">
-    <span class="score-label">Score:</span>
-    <span class="score-number">{{ score }}</span>
+  
+  <div class="header-controls">
+    <div class="score-display">
+      <span class="score-label">Score:</span>
+      <span class="score-number">{{ score }}</span>
+    </div>
+    
+    <button 
+      class="audio-toggle"
+      (click)="toggleAudio()"
+      [title]="isAudioEnabled() ? 'Turn sound off' : 'Turn sound on'">
+      {{ isAudioEnabled() ? '🔊' : '🔇' }}
+    </button>
   </div>
 </div>
