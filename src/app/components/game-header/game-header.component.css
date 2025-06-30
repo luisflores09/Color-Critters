@@ -10,10 +10,43 @@
   flex-shrink: 0; /* Prevent shrinking */
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  min-width: 60px; /* Ensure space for home button */
+}
+
+.home-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.home-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.home-button:active {
+  transform: scale(0.95);
+}
+
 .target-color-display {
   display: flex;
   align-items: center;
   gap: 15px;
+  flex: 1;
+  justify-content: center;
+  min-width: 0; /* Allow shrinking if needed */
 }
 
 .target-color-display h2 {
@@ -47,6 +80,8 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  min-width: 120px; /* Ensure space for score and audio toggle */
+  justify-content: flex-end;
 }
 
 .audio-toggle {
@@ -98,8 +133,15 @@
     min-height: 80px; /* Ensure consistent header height */
   }
   
+  .home-button {
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
+  }
+  
   .header-controls {
     gap: 10px;
+    min-width: 100px;
   }
   
   .target-color-display {
@@ -132,14 +174,25 @@
   .game-header {
     padding: 8px 10px;
     min-height: 70px; /* Compact but functional */
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Keep everything in one row */
     gap: 5px;
+  }
+  
+  .header-left {
+    min-width: 40px;
+  }
+  
+  .home-button {
+    width: 35px;
+    height: 35px;
+    font-size: 1.1rem;
   }
   
   .target-color-display {
     gap: 8px;
     flex: 1;
     min-width: 0;
+    justify-content: center;
   }
   
   .target-color-display h2 {
@@ -166,6 +219,8 @@
   
   .header-controls {
     flex-shrink: 0;
+    min-width: 80px;
+    gap: 8px;
   }
   
   .audio-toggle {

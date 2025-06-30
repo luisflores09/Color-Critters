@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { GameService } from '../../services/game.service';
 import { AudioService } from '../../services/audio.service';
 
@@ -15,8 +16,14 @@ export class GameHeaderComponent {
 
   constructor(
     private gameService: GameService,
-    private audioService: AudioService
+    private audioService: AudioService,
+    private router: Router
   ) {}
+
+  goHome(): void {
+    // Navigate back to the main menu
+    this.router.navigate(['/']);
+  }
 
   getTargetAnimalEmoji(): string {
     return this.gameService.getTargetAnimalEmoji();

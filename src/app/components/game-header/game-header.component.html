@@ -1,5 +1,14 @@
 <!-- Header with target animal and score -->
 <div class="game-header">
+  <div class="header-left">
+    <button 
+      class="home-button"
+      (click)="goHome()"
+      title="Go to Main Menu">
+      🏠
+    </button>
+  </div>
+  
   <div class="target-color-display">
     <h2>Tap the {{ getTargetAnimalName() }}s!</h2>
     <div class="target-color-indicator">
