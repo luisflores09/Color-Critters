@@ -1,6 +1,0 @@
-/* App Component - Main container only */
-:host {
-  display: block;
-  width: 100%;
-  height: 100vh;
-}
