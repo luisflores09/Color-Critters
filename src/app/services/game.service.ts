@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Critter, GameColor, GameState } from '../models/critter.model';
+import { Critter, GameColor, GameAnimal, GameState } from '../models/critter.model';
 import { AudioService } from './audio.service';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { AudioService } from './audio.service';
 export class GameService {
   private gameStateSubject = new BehaviorSubject<GameState>({
     critters: [],
-    targetColor: '',
+    targetAnimal: '',
     score: 0,
     gameActive: false,
     celebrationMode: false
@@ -18,7 +18,19 @@ export class GameService {
   public gameState$: Observable<GameState> = this.gameStateSubject.asObservable();
 
   // Game configuration
-  public readonly animals = ['🐶', '🐱', '🐰', '🦊', '🐸', '🐧', '🦋', '🐝', '🐢', '🦆'];
+  public readonly animals: GameAnimal[] = [
+    { name: 'dog', emoji: '🐶', soundName: 'woof' },
+    { name: 'cat', emoji: '🐱', soundName: 'meow' },
+    { name: 'rabbit', emoji: '🐰', soundName: 'hop' },
+    { name: 'fox', emoji: '🦊', soundName: 'bark' },
+    { name: 'frog', emoji: '🐸', soundName: 'ribbit' },
+    { name: 'penguin', emoji: '🐧', soundName: 'squeak' },
+    { name: 'butterfly', emoji: '🦋', soundName: 'flutter' },
+    { name: 'bee', emoji: '🐝', soundName: 'buzz' },
+    { name: 'turtle', emoji: '🐢', soundName: 'slow' },
+    { name: 'duck', emoji: '🦆', soundName: 'quack' }
+  ];
+  
   public readonly colors: GameColor[] = [
     { name: 'red', hex: '#FF6B6B', emoji: '🔴' },
     { name: 'blue', hex: '#4ECDC4', emoji: '🔵' },
@@ -43,12 +55,12 @@ export class GameService {
       gameActive: true,
       score: 0,
       critters: [],
-      targetColor: '',
+      targetAnimal: '',
       celebrationMode: false
     };
 
     this.updateGameState(newState);
-    this.setNewTargetColor();
+    this.setNewTargetAnimal();
     this.startGameIntervals();
   }
 
@@ -79,16 +91,18 @@ export class GameService {
         critters: updatedCritters
       });
 
+      // Play sound and speak animal name
       this.playSuccessSound();
+      this.speakTappedAnimal(critter.animal);
 
       // Check for celebration milestone
-      if (newScore % 5 === 0) {
+      if (newScore % 10 === 0) {
         this.triggerCelebration();
       }
 
-      // Change target color every 3 correct answers
+      // Change target animal every 3 correct answers
       if (newScore % 3 === 0) {
-        setTimeout(() => this.setNewTargetColor(), 1000);
+        setTimeout(() => this.setNewTargetAnimal(), 1000);
       }
     } else {
       this.updateGameState({
@@ -96,6 +110,7 @@ export class GameService {
         critters: updatedCritters
       });
       this.playEncouragementSound();
+      this.speakTappedAnimal(critter.animal);
     }
 
     // Remove critter after animation
@@ -107,14 +122,27 @@ export class GameService {
   getColorByName(colorName: string): GameColor | undefined {
     return this.colors.find(c => c.name === colorName);
   }
+  
+  getAnimalByName(animalName: string): GameAnimal | undefined {
+    return this.animals.find(a => a.name === animalName);
+  }
+  
+  getAnimalByEmoji(emoji: string): GameAnimal | undefined {
+    return this.animals.find(a => a.emoji === emoji);
+  }
 
   getColorHex(colorName: string): string {
     return this.getColorByName(colorName)?.hex || '#000';
   }
 
-  getTargetColorEmoji(): string {
+  getTargetAnimalEmoji(): string {
     const currentState = this.getCurrentState();
-    return this.getColorByName(currentState.targetColor)?.emoji || '⭕';
+    return this.getAnimalByName(currentState.targetAnimal)?.emoji || '🐶';
+  }
+  
+  getTargetAnimalName(): string {
+    const currentState = this.getCurrentState();
+    return this.getAnimalByName(currentState.targetAnimal)?.name || 'dogs';
   }
 
   private getCurrentState(): GameState {
@@ -125,16 +153,26 @@ export class GameService {
     this.gameStateSubject.next(newState);
   }
 
-  private setNewTargetColor(): void {
-    const randomColor = this.colors[Math.floor(Math.random() * this.colors.length)];
+  private setNewTargetAnimal(): void {
+    const randomAnimal = this.animals[Math.floor(Math.random() * this.animals.length)];
     const currentState = this.getCurrentState();
+    
+    // Update all existing critters' isCorrect property based on new target
+    const updatedCritters = currentState.critters.map(critter => {
+      const critterAnimal = this.getAnimalByEmoji(critter.animal);
+      return {
+        ...critter,
+        isCorrect: critterAnimal ? critterAnimal.name === randomAnimal.name : false
+      };
+    });
     
     this.updateGameState({
       ...currentState,
-      targetColor: randomColor.name
+      targetAnimal: randomAnimal.name,
+      critters: updatedCritters
     });
     
-    this.playColorAnnouncement();
+    this.playAnimalAnnouncement();
   }
 
   private spawnCritter(): void {
@@ -143,20 +181,19 @@ export class GameService {
 
     const randomAnimal = this.animals[Math.floor(Math.random() * this.animals.length)];
     const randomColor = this.colors[Math.floor(Math.random() * this.colors.length)];
-    const isCorrect = randomColor.name === currentState.targetColor;
+    const isCorrect = randomAnimal.name === currentState.targetAnimal;
 
-    // Ensure at least 30% chance of correct color
-    const targetColorObj = this.getColorByName(currentState.targetColor);
-    const finalColor = Math.random() < 0.7 && isCorrect ? randomColor : 
-                      Math.random() < 0.3 && targetColorObj ? targetColorObj : randomColor;
+    // Ensure at least 40% chance of correct animal
+    const targetAnimalObj = this.getAnimalByName(currentState.targetAnimal);
+    const finalAnimal = Math.random() < 0.4 && targetAnimalObj ? targetAnimalObj : randomAnimal;
 
     const newCritter: Critter = {
       id: Date.now() + Math.random(),
-      animal: randomAnimal,
-      color: finalColor.name,
+      animal: finalAnimal.emoji,
+      color: randomColor.name,
       x: Math.random() * 80 + 5, // 5% to 85% of screen width
       y: Math.random() * 70 + 15, // 15% to 85% of screen height
-      isCorrect: finalColor.name === currentState.targetColor,
+      isCorrect: finalAnimal.name === currentState.targetAnimal,
       isAnimating: false
     };
 
@@ -230,8 +267,17 @@ export class GameService {
   }
 
   // Audio methods - now using AudioService
-  private playColorAnnouncement(): void {
-    this.audioService.playColorAnnouncement();
+  private playAnimalAnnouncement(): void {
+    const currentState = this.getCurrentState();
+    const targetAnimal = this.getAnimalByName(currentState.targetAnimal);
+    
+    if (targetAnimal) {
+      // Play both sound and speech
+      this.audioService.playColorAnnouncement(); // Attention sound
+      setTimeout(() => {
+        this.audioService.speakTargetAnimal(targetAnimal.name);
+      }, 500); // Small delay after attention sound
+    }
   }
 
   private playSuccessSound(): void {
@@ -244,5 +290,13 @@ export class GameService {
 
   private playVictorySound(): void {
     this.audioService.playVictorySound();
+  }
+
+  private speakTappedAnimal(animalEmoji: string): void {
+    // Find the animal by emoji and speak its name
+    const animal = this.getAnimalByEmoji(animalEmoji);
+    if (animal) {
+      this.audioService.speakAnimalName(animal.name);
+    }
   }
 }

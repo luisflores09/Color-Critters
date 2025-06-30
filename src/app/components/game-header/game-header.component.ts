@@ -10,7 +10,7 @@ import { AudioService } from '../../services/audio.service';
   styleUrl: './game-header.component.css'
 })
 export class GameHeaderComponent {
-  @Input() targetColor: string = '';
+  @Input() targetAnimal: string = '';
   @Input() score: number = 0;
 
   constructor(
@@ -18,8 +18,12 @@ export class GameHeaderComponent {
     private audioService: AudioService
   ) {}
 
-  getTargetColorEmoji(): string {
-    return this.gameService.getTargetColorEmoji();
+  getTargetAnimalEmoji(): string {
+    return this.gameService.getTargetAnimalEmoji();
+  }
+  
+  getTargetAnimalName(): string {
+    return this.gameService.getTargetAnimalName();
   }
 
   getColorHex(colorName: string): string {

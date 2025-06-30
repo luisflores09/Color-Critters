@@ -7,6 +7,7 @@
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .target-color-display {
@@ -32,6 +33,8 @@
   font-size: 2rem;
   border: 4px solid white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
   animation: pulse 2s infinite;
 }
 
@@ -91,13 +94,15 @@
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .game-header {
-    flex-direction: column;
-    gap: 10px;
     padding: 10px 15px;
+    min-height: 80px; /* Ensure consistent header height */
   }
   
   .header-controls {
-    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .target-color-display {
     gap: 10px;
   }
   
@@ -126,34 +131,46 @@
 @media (max-width: 480px) {
   .game-header {
     padding: 8px 10px;
-    gap: 8px;
+    min-height: 70px; /* Compact but functional */
+    flex-wrap: wrap;
+    gap: 5px;
   }
   
   .target-color-display {
-    gap: 10px;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
   }
   
   .target-color-display h2 {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   
   .target-color-indicator {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+    width: 35px;
+    height: 35px;
+    font-size: 1.1rem;
+  }
+  
+  .score-display {
+    flex-shrink: 0;
   }
   
   .score-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
   
   .score-number {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+  }
+  
+  .header-controls {
+    flex-shrink: 0;
   }
   
   .audio-toggle {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+    width: 35px;
+    height: 35px;
+    font-size: 1.1rem;
   }
 }

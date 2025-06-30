@@ -1,8 +1,8 @@
 <!-- Color Critters Game -->
 <div class="game-container" *ngIf="gameState$ | async as gameState">
-  <!-- Header with target color and score -->
+  <!-- Header with target animal and score -->
   <app-game-header 
-    [targetColor]="gameState.targetColor"
+    [targetAnimal]="gameState.targetAnimal"
     [score]="gameState.score">
   </app-game-header>
 

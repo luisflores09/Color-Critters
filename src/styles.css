@@ -5,14 +5,27 @@
   box-sizing: border-box;
 }
 
-html, body {
+/* Global Styles for Color Critters */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
   height: 100%;
   width: 100%;
   overflow: hidden;
   font-family: 'Comic Sans MS', cursive, sans-serif;
+  
+  /* Support for dynamic viewport units */
+  height: 100dvh;
+  min-height: 100vh; /* Fallback */
 }
 
 body {
+  height: 100%;
+  width: 100%;
   background: #667eea;
   touch-action: manipulation;
   -webkit-touch-callout: none;
@@ -21,6 +34,22 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  
+  /* Ensure proper mobile handling */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+/* Support for safe area insets */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
 
 /* Prevent zoom on double tap for mobile */

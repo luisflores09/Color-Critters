@@ -6,9 +6,11 @@ import { Injectable } from '@angular/core';
 export class AudioService {
   private audioContext: AudioContext | null = null;
   private isAudioEnabled = true;
+  private speechSynthesis: SpeechSynthesis | null = null;
 
   constructor() {
     this.initializeAudio();
+    this.initializeSpeech();
   }
 
   private initializeAudio(): void {
@@ -18,6 +20,21 @@ export class AudioService {
     } catch (error) {
       console.warn('Web Audio API not supported:', error);
       this.isAudioEnabled = false;
+    }
+  }
+
+  private initializeSpeech(): void {
+    if ('speechSynthesis' in window) {
+      this.speechSynthesis = window.speechSynthesis;
+      
+      // Load voices (some browsers need this)
+      if (this.speechSynthesis.getVoices().length === 0) {
+        this.speechSynthesis.addEventListener('voiceschanged', () => {
+          // Voices are now loaded
+        });
+      }
+    } else {
+      console.warn('Speech synthesis not supported');
     }
   }
 
@@ -31,6 +48,60 @@ export class AudioService {
         console.warn('Could not resume audio context:', error);
       }
     }
+  }
+
+  // Text-to-speech methods
+  speakAnimalName(animalName: string): void {
+    if (!this.isAudioEnabled || !this.speechSynthesis) return;
+
+    // Cancel any ongoing speech
+    this.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(animalName);
+    utterance.rate = 0.8; // Slightly slower for children
+    utterance.pitch = 1.2; // Slightly higher pitch for friendliness
+    utterance.volume = 0.8;
+    
+    // Use a child-friendly voice if available
+    const voices = this.speechSynthesis.getVoices();
+    const childVoice = voices.find(voice => 
+      voice.name.toLowerCase().includes('child') || 
+      voice.name.toLowerCase().includes('kids') ||
+      voice.name.toLowerCase().includes('female')
+    );
+    
+    if (childVoice) {
+      utterance.voice = childVoice;
+    }
+
+    this.speechSynthesis.speak(utterance);
+  }
+
+  speakTargetAnimal(animalName: string): void {
+    if (!this.isAudioEnabled || !this.speechSynthesis) return;
+
+    // Cancel any ongoing speech
+    this.speechSynthesis.cancel();
+
+    const message = `Find the ${animalName}s!`;
+    const utterance = new SpeechSynthesisUtterance(message);
+    utterance.rate = 0.7; // Slower for instructions
+    utterance.pitch = 1.1;
+    utterance.volume = 0.9;
+    
+    // Use a child-friendly voice if available
+    const voices = this.speechSynthesis.getVoices();
+    const childVoice = voices.find(voice => 
+      voice.name.toLowerCase().includes('child') || 
+      voice.name.toLowerCase().includes('kids') ||
+      voice.name.toLowerCase().includes('female')
+    );
+    
+    if (childVoice) {
+      utterance.voice = childVoice;
+    }
+
+    this.speechSynthesis.speak(utterance);
   }
 
   // Play success sound - cheerful ascending notes

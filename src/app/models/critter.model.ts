@@ -14,9 +14,15 @@ export interface GameColor {
   emoji: string;
 }
 
+export interface GameAnimal {
+  name: string;
+  emoji: string;
+  soundName: string;
+}
+
 export interface GameState {
   critters: Critter[];
-  targetColor: string;
+  targetAnimal: string;
   score: number;
   gameActive: boolean;
   celebrationMode: boolean;
