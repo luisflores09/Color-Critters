@@ -1,0 +1,30 @@
+/* Game Container Styles */
+.game-container {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Game Area */
+.game-area {
+  position: relative;
+  height: calc(100vh - 180px);
+  width: 100%;
+  overflow: hidden;
+}
+
+.game-area.celebration-mode {
+  animation: rainbow-background 3s infinite;
+}
+
+@keyframes rainbow-background {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}

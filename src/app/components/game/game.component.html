@@ -1,0 +1,28 @@
+<!-- Color Critters Game -->
+<div class="game-container" *ngIf="gameState$ | async as gameState">
+  <!-- Header with target color and score -->
+  <app-game-header 
+    [targetColor]="gameState.targetColor"
+    [score]="gameState.score">
+  </app-game-header>
+
+  <!-- Game area where critters appear -->
+  <div class="game-area" [class.celebration-mode]="gameState.celebrationMode">
+    <!-- Critters -->
+    <app-critter
+      *ngFor="let critter of gameState.critters; trackBy: trackByCritterId"
+      [critter]="critter"
+      (critterTapped)="onCritterTap($event)">
+    </app-critter>
+
+    <!-- Celebration overlay -->
+    <app-celebration [show]="gameState.celebrationMode"></app-celebration>
+  </div>
+
+  <!-- Start/Reset button -->
+  <app-game-controls
+    [gameActive]="gameState.gameActive"
+    [celebrationMode]="gameState.celebrationMode"
+    (startGame)="onStartGame()">
+  </app-game-controls>
+</div>

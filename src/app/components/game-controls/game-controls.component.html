@@ -1,0 +1,9 @@
+<!-- Start/Reset button -->
+<div class="game-controls">
+  <button 
+    class="game-button" 
+    (click)="onStartGame()"
+    [disabled]="celebrationMode">
+    {{ gameActive ? 'New Game' : 'Start Game' }}
+  </button>
+</div>
